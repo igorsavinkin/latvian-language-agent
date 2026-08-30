@@ -1,0 +1,22 @@
+services:
+  latvian-agent:
+    build: .
+    container_name: latvian-agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./vocabulary.json:/app/vocabulary.json:ro 
+      - ./lesson_cache.json:/app/lesson_cache.json
+
+  vocabulary-sync:
+    build: .
+    container_name: vocabulary-sync
+    restart: unless-stopped
+    command: uvicorn sync_server:app --host 0.0.0.0 --port 8081
+    env_file:
+      - .env
+    volumes:
+      - ./vocabulary.json:/app/vocabulary.json
+    ports:
+      - "8081:8081"
