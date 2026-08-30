@@ -246,6 +246,11 @@ The token is stored in `.env`:
 SYNC_TOKEN=your-secret-token
 ```
 
+The AI lesson generation also requires a DeepSeek API key:
+```text
+DEEPSEEK_API_KEY=your-deepseek-api-key
+```
+
 `.env` is excluded from Git through `.gitignore`.
 
 **Never commit `.env` to GitHub.**
@@ -320,9 +325,19 @@ cd latvian-language-agent
 
 Create the environment file:
 
-```bash
-cp .env.example .env
+`cp .env.example .env`
+
+The repository should contain `.env.example` with placeholder values only. It is a template for creating the local `.env` file and must never contain real tokens or credentials.
+
+Example `.env.example`:
+
+```text
+SYNC_TOKEN=change-me
+TELEGRAM_BOT_TOKEN=change-me
+DEEPSEEK_API_KEY=change-me
 ```
+
+Replace the placeholder values in `.env` with your actual credentials. Keep `.env` local and never commit it to GitHub.
 
 Install dependencies:
 
