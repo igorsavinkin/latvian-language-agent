@@ -8,8 +8,7 @@ vocabulary.json
 lesson_cache.json
 
 # Backups / old versions
-*.save
-bot_old.py
+*.bak
 
 # Python
 __pycache__/
