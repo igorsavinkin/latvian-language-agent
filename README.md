@@ -209,30 +209,24 @@ Expected response:
 
 The project uses a browser bookmarklet to collect Latvian vocabulary from a Yandex Translate collection.
 
-The bookmarklet is saved as a normal browser bookmark, but its URL starts with:
+The bookmarklet is saved as a normal browser bookmark, but its URL starts with `javascript`. The code:  
 
 ```text
-javascript:
+javascript:(async()=>{try{const id='6a926bb9d12c1b66457218ee';const r=await fetch('/props/api/collections/'+id+'?srv=tr-text&uid=207946218');if(!r.ok)throw new Error('Yandex API HTTP '+r.status);const d=await r.json();const words=(d.collection?.records||[]).map(x=>({lv:x.text,ru:x.translation,score:x.score||0,id:x.id}));if(!words.length)throw new Error('No words found');const f=document.createElement('form');f.method='POST';f.action='https://webscraping.pro/latvian-sync';f.target='_blank';const w=document.createElement('input');w.type='hidden';w.name='words';w.value=JSON.stringify(words);const t=document.createElement('input');t.type='hidden';t.name='token';t.value='SYNC_TOKEN';f.append(w,t);document.body.appendChild(f);f.submit();f.remove()}catch(e){console.error(e);alert('❌ Sync failed\n\n'+e.message)}})()
 ```
-
-The code:
-
-```text
-javascript:(async()=>{try{const id='6a926bb9d12c1b66457218ee';const r=await fetch('/props/api/collections/'+id+'?srv=tr-text&uid=207946218');if(!r.ok)throw new Error('Yandex API HTTP '+r.status);const d=await r.json();const words=(d.collection?.records||[]).map(x=>({lv:x.text,ru:x.translation,score:x.score||0,id:x.id}));if(!words.length)throw new Error('No words found');const f=document.createElement('form');f.method='POST';f.action='https://webscraping.pro/latvian-sync';f.target='_blank';const w=document.createElement('input');w.type='hidden';w.name='words';w.value=JSON.stringify(words);const t=document.createElement('input');t.type='hidden';t.name='token';t.value='YOUR-SECRET_TOKEN';f.append(w,t);document.body.appendChild(f);f.submit();f.remove()}catch(e){console.error(e);alert('❌ Sync failed\n\n'+e.message)}})()
-```
-Replace in the above bookmarklet `YOUR-SECRET_TOKEN` with actual secret code from `.env`
+In the above bookmarklet replace `SYNC_TOKEN` with actual `SYNC_TOKEN` value from `.env`.
 
 ### Installation
 
 1. Open Chrome.
 2. Create a new bookmark.
-3. Give it a name such as:
+3. Give it a name, eg.:
 
 ```text
 🇱🇻 Sync Latvian Vocabulary
 ```
 
-4. Paste the bookmarklet JavaScript into the bookmark URL.
+4. Paste the bookmarklet JavaScript (above) into the bookmark URL.
 5. Open the Yandex Translate collection.
 6. Run the bookmarklet.
 
@@ -277,18 +271,6 @@ Stop:
 docker compose down
 ```
 
-## Environment Variables
-
-Create `.env` locally:
-
-```text
-SYNC_TOKEN=your-secret-token
-```
-
-Additional variables used by the Telegram bot should also be stored in `.env`.
-
-Do not commit `.env`.
-
 ## Nginx
 
 The synchronization API is exposed through the main web server:
@@ -306,10 +288,10 @@ Nginx proxies the request to the internal FastAPI service:
      Nginx
        │
        ▼
-127.0.0.1:8081
+ 127.0.0.1:8081
        │
        ▼
- FastAPI /sync
+  FastAPI /sync
 ```
 
 The FastAPI service itself does not need to be publicly exposed.
@@ -323,7 +305,9 @@ git clone git@github.com:igorsavinkin/latvian-language-agent.git
 cd latvian-language-agent
 ```
 
-Create the environment file:
+## Environment Variables
+
+Create the environment file from an example file:
 
 `cp .env.example .env`
 
@@ -366,8 +350,6 @@ The following files are intentionally ignored:
 .env.*
 vocabulary.json
 lesson_cache.json
-*.save
-bot_old.py
 ```
 
 This keeps:
