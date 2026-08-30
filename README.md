@@ -21,8 +21,8 @@ The project combines a Telegram bot, an AI lesson generator, a vocabulary databa
 
 ```text
                     ┌─────────────────────┐
-                    │   Yandex Translate   │
-                    │      Collection      │
+                    │   Yandex Translate  │
+                    │      Collection     │
                     └──────────┬──────────┘
                                │
                          Bookmarklet
@@ -38,17 +38,17 @@ The project combines a Telegram bot, an AI lesson generator, a vocabulary databa
 ┌─────────────────────────────────────────────────────────┐
 │                     VPS / Docker                        │
 │                                                         │
-│  ┌─────────────────┐       ┌─────────────────────────┐  │
-│  │  Telegram Bot   │       │  vocabulary-sync        │  │
-│  │    bot.py       │       │  FastAPI                │  │
-│  └────────┬────────┘       └────────────┬────────────┘  │
+│  ┌─────────────────┐       ┌──────────────────────┐     │
+│  │  Telegram Bot   │       │  vocabulary-sync     │     │
+│  │    bot.py       │       │  FastAPI             │     │
+│  └────────┬────────┘       └────────────┬─────────┘     │
 │           │                             │               │
 │           ▼                             ▼               │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │              Vocabulary / Lesson data             │  │
-│  │                                                   │  │
-│  │  vocabulary.json       lesson_cache.json          │  │
-│  └──────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │              Vocabulary / Lesson data            │   │
+│  │                                                  │   │
+│  │  vocabulary.json       lesson_cache.json         │   │
+│  └──────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -215,11 +215,12 @@ The bookmarklet is saved as a normal browser bookmark, but its URL starts with:
 javascript:
 ```
 
-Example:
+The code:
 
 ```text
-javascript:(()=>{ /* bookmarklet code */ })();
+javascript:(async()=>{try{const id='6a926bb9d12c1b66457218ee';const r=await fetch('/props/api/collections/'+id+'?srv=tr-text&uid=207946218');if(!r.ok)throw new Error('Yandex API HTTP '+r.status);const d=await r.json();const words=(d.collection?.records||[]).map(x=>({lv:x.text,ru:x.translation,score:x.score||0,id:x.id}));if(!words.length)throw new Error('No words found');const f=document.createElement('form');f.method='POST';f.action='https://webscraping.pro/latvian-sync';f.target='_blank';const w=document.createElement('input');w.type='hidden';w.name='words';w.value=JSON.stringify(words);const t=document.createElement('input');t.type='hidden';t.name='token';t.value='YOUR-SECRET_TOKEN';f.append(w,t);document.body.appendChild(f);f.submit();f.remove()}catch(e){console.error(e);alert('❌ Sync failed\n\n'+e.message)}})()
 ```
+Replace in the above bookmarklet `YOUR-SECRET_TOKEN` with actual secret code from `.env`
 
 ### Installation
 
@@ -294,16 +295,16 @@ https://webscraping.pro/latvian-sync
 Nginx proxies the request to the internal FastAPI service:
 
 ```text
-webscraping.pro
+ webscraping.pro
        │
        ▼
-Nginx
+     Nginx
        │
        ▼
 127.0.0.1:8081
        │
        ▼
-FastAPI /sync
+ FastAPI /sync
 ```
 
 The FastAPI service itself does not need to be publicly exposed.
